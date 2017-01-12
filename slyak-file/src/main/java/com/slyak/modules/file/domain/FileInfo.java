@@ -2,8 +2,10 @@ package com.slyak.modules.file.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
+import com.slyak.spring.jpa.hibernate.JSONType;
 import lombok.Data;
 import lombok.SneakyThrows;
+import org.hibernate.annotations.Type;
 import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +23,7 @@ import java.util.Map;
  */
 @Data
 @Entity
-@Table(name = "t_file_info",indexes = @Index(columnList = "key"))
+@Table(name = "t_file_info", indexes = @Index(columnList = "key"))
 public class FileInfo extends AbstractAuditable<Long, Long> {
 
 	@Transient
@@ -39,6 +41,7 @@ public class FileInfo extends AbstractAuditable<Long, Long> {
 	/*file owner*/
 	private String owner;
 
+	@Type(type = JSONType.TYPE)
 	private Map<String, String> meta = Maps.newHashMap();
 
 	@SneakyThrows

@@ -16,4 +16,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan({ "${slyak.core.jpa.basePackages:com.slyak}" })
 public class JpaConfig {
 
+
 }
