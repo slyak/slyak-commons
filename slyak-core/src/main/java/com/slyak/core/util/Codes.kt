@@ -29,17 +29,22 @@ object Codes {
     private fun byte(input: String) = input.toByteArray(DEFAULT_ENCODING)
 }
 
+class Test {
+    val p: String by lazy {
+        println("p is lazy")
+        "tesat"
+    }
+}
+
 fun main(args: Array<String>) {
+    val test = Test()
+    println(test.p)
+    println(test.p)
+
+
     val base64 = Codes.base64("abcdefg«")
     println(base64)
     println(Codes.DEFAULT_ENCODING)
     println(Codes.base64Decode(base64))
     println(Codes.uuidMd5())
-
-    var names = listOf("AAA", "bbb")
-
-    names.filter { it.startsWith("A") }.sortedBy { it }
-         /*   .filter { it.startsWith("A") }
-            .sortedBy { it }
-            .map { it.toUpperCase() }.forEach { print(it) }*/
 }

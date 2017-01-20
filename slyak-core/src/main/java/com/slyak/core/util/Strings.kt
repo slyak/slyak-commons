@@ -1,8 +1,6 @@
 package com.slyak.core.util
 
-import com.slyak.core.extension.parseDate
-import com.slyak.core.extension.randomLetter
-import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.RandomStringUtils
 
 /**
  * .
@@ -11,29 +9,28 @@ import org.apache.commons.lang3.StringUtils
  *
  */
 
-object Test{
-    fun a()="asd"
+object Strings {
+    val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    fun randomLetters(len: Int): String? {
+        return RandomStringUtils.random(len, chars)
+    }
+}
+
+fun transform(color: String): Int {
+    return when (color) {
+        "Red" -> 0
+        "Green" -> 1
+        "Blue" -> 2
+        else -> throw IllegalArgumentException("Invalid color param value")
+    }
 }
 
 fun main(args: Array<String>) {
-//    var map = mapOf(Pair("a", "b"), Pair("c", "d"))
 
-    Test.a()
+    val b: Boolean? = null
+    if (b == true) {
 
-    var map = mapOf("a" to "b", "c" to "d")
-    for ((k, v) in map) {
-        println("key:$k,value:$v")
+    } else {
+        // `b` is false or null
     }
-
-    for (i in 1..10) {
-        println(i)
-    }
-
-    fun String.spaceToCamelCase(): String {
-        return this.toLowerCase()
-    }
-
-    println(StringUtils().randomLetter(4))
-
-    println("2012/09/09".parseDate("yyyy/MM/dd"))
 }
