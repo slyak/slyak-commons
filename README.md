@@ -6,6 +6,7 @@ slyak common service based on spring cloud exposed by docker
 * slyak-core
 
 ### services
+* slyak-config
 * slyak-cache
 * slyak-gateway
 * slyak-file

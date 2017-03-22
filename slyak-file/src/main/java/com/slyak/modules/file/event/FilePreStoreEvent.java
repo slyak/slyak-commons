@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationEvent;
  *
  * @author stormning on 2017/1/6.
  */
-public class FilePreStoreEvent extends ApplicationEvent{
+public class FilePreStoreEvent extends ApplicationEvent {
 	/**
 	 * Create a new ApplicationEvent.
 	 *
