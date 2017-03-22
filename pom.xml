@@ -62,5 +62,6 @@
         <module>slyak-core</module>
         <module>slyak-file</module>
         <module>slyak-identity</module>
+        <module>slyak-gateway</module>
     </modules>
 </project>
