@@ -65,5 +65,6 @@
         <module>slyak-gateway</module>
         <module>slyak-cache</module>
         <module>slyak-config</module>
+        <module>slyak-search</module>
     </modules>
 </project>
