@@ -19,32 +19,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>slyak-commons</artifactId>
+        <artifactId>slyak-services</artifactId>
         <groupId>com.slyak.commons</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>slyak-dict</artifactId>
+    <name>SLYAK Dict</name>
+    <description>SLYAK Dict</description>
 
-    <artifactId>slyak-services</artifactId>
-    <packaging>pom</packaging>
-    <name>SLYAK Services</name>
-    <description>SLYAK Services</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-eureka</artifactId>
-        </dependency>
-    </dependencies>
-
-    <modules>
-        <module>slyak-cache</module>
-        <module>slyak-config</module>
-        <module>slyak-gateway</module>
-        <module>slyak-identity</module>
-        <module>slyak-search</module>
-        <module>slyak-file</module>
-        <module>slyak-registry</module>
-        <module>slyak-dict</module>
-    </modules>
 </project>
