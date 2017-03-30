@@ -25,6 +25,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>slyak-registry</artifactId>
+    <name>SLYAK Registry</name>
+    <description>SLYAK Registry</description>
 
     <dependencies>
         <dependency>

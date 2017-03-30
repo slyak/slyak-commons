@@ -27,6 +27,8 @@
 
     <artifactId>slyak-services</artifactId>
     <packaging>pom</packaging>
+    <name>SLYAK Services</name>
+    <description>SLYAK Services</description>
 
     <dependencies>
         <dependency>
