@@ -60,7 +60,8 @@
     </build>
 
     <modules>
-        <module>slyak-core</module>
+        <module>slyak-sdks</module>
         <module>slyak-services</module>
+        <module>slyak-sdks</module>
     </modules>
 </project>
