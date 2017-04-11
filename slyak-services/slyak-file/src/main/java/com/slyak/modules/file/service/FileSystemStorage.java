@@ -12,6 +12,9 @@ public class FileSystemStorage implements StorageService {
 
 	private String storePath;
 
+	public static void main(String[] args) {
+	}
+
 	@Override
 	public String store(InputStream inputStream) {
 		String key = "";
@@ -22,8 +25,5 @@ public class FileSystemStorage implements StorageService {
 	@Override
 	public File restore(String key) {
 		return null;
-	}
-
-	public static void main(String[] args) {
 	}
 }

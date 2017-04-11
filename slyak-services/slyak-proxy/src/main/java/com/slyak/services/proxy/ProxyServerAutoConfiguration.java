@@ -14,17 +14,23 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.registry;
+package com.slyak.services.proxy;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.slyak.services.proxy.impl.Socks5ProxyServer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * .
  *
- * @author stormning 2017/3/30
+ * @author stormning 2017/4/11
  * @since 1.3.0
  */
-@SpringBootApplication
-public class Application {
+@Configuration
+public class ProxyServerAutoConfiguration {
 
+	@Bean(destroyMethod = "stop", initMethod = "start")
+	ProxyServer socks5ProxyServer() {
+		return new Socks5ProxyServer();
+	}
 }

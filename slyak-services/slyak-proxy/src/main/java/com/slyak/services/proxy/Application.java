@@ -14,17 +14,21 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.registry;
+package com.slyak.services.proxy;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * .
  *
- * @author stormning 2017/3/30
+ * @author stormning 2017/4/7
  * @since 1.3.0
  */
 @SpringBootApplication
 public class Application {
 
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
 }

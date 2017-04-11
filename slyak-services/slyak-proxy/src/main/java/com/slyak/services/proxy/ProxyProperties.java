@@ -14,17 +14,21 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.registry;
+package com.slyak.services.proxy;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import lombok.Data;
 
 /**
  * .
  *
- * @author stormning 2017/3/30
+ * @author stormning 2017/4/10
  * @since 1.3.0
  */
-@SpringBootApplication
-public class Application {
+@Data
+public class ProxyProperties {
+	int bossCount;
 
+	int workerCount;
+
+	long connectionTimeOut;
 }

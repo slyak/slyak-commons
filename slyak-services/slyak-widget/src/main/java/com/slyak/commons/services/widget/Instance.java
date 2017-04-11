@@ -14,17 +14,22 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.registry;
+package com.slyak.commons.services.widget;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import lombok.Data;
+
+import java.util.Map;
 
 /**
  * .
  *
- * @author stormning 2017/3/30
+ * @author stormning 2017/4/11
  * @since 1.3.0
  */
-@SpringBootApplication
-public class Application {
+@Data
+public class Instance {
 
+	private String id;
+
+	private Map<String, Object> attrs;
 }

@@ -2,7 +2,7 @@ package com.slyak.modules.file.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
-import com.slyak.spring.jpa.hibernate.JSONType;
+//import com.slyak.spring.jpa.hibernate.JSONType;
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.hibernate.annotations.Type;
@@ -41,7 +41,7 @@ public class FileInfo extends AbstractAuditable<Long, Long> {
 	/*file owner*/
 	private String owner;
 
-	@Type(type = JSONType.TYPE)
+//	@Type(type = JSONType.TYPE)
 	private Map<String, String> meta = Maps.newHashMap();
 
 	@SneakyThrows

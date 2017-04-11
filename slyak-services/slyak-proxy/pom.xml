@@ -19,17 +19,36 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>slyak-sdks</artifactId>
+        <artifactId>slyak-commons</artifactId>
         <groupId>com.slyak.commons</groupId>
         <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../../slyak-commons</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>slyak-apis</artifactId>
+    <artifactId>slyak-proxy</artifactId>
 
-    <!--<dependencies>
+    <dependencies>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
-    </dependencies>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.9.Final</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

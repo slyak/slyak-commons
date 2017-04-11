@@ -14,17 +14,14 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.registry;
-
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+package com.slyak.commons.services.workflow;
 
 /**
  * .
  *
- * @author stormning 2017/3/30
+ * @author stormning 2017/4/11
  * @since 1.3.0
  */
-@SpringBootApplication
-public class Application {
+public interface WorkflowService {
 
 }

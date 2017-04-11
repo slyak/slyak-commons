@@ -14,17 +14,16 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.registry;
-
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+package com.slyak.services.proxy;
 
 /**
  * .
  *
- * @author stormning 2017/3/30
+ * @author stormning 2017/4/10
  * @since 1.3.0
  */
-@SpringBootApplication
-public class Application {
+public interface ProxyServer {
+	void start();
 
+	void stop();
 }

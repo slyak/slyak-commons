@@ -1,0 +1,7 @@
+node1:
+  name: "开始"
+  conditions:
+    y: "node3"
+    n: ""
+
+node2:
