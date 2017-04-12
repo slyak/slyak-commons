@@ -26,8 +26,10 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.socksx.SocksVersion;
 import io.netty.handler.codec.socksx.v5.*;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.proxy.ProxyHandler;
 import io.netty.handler.proxy.Socks5ProxyHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -77,9 +79,9 @@ public class Socks5ProxyServer extends NettyProxyServer {
 	public class Socks5InitialRequestHandler extends SimpleChannelInboundHandler<DefaultSocks5InitialRequest> {
 		@Override
 		protected void channelRead0(ChannelHandlerContext ctx, DefaultSocks5InitialRequest msg) throws Exception {
-			log.debug("初始化ss5连接 : " + msg);
+			log.debug("init socks5 connection " + msg);
 			if (msg.decoderResult().isFailure()) {
-				log.debug("不是ss5协议");
+				log.debug("not a socks5 connection");
 				ctx.fireChannelRead(msg);
 			}
 			else {
@@ -105,29 +107,36 @@ public class Socks5ProxyServer extends NettyProxyServer {
 		@Override
 		protected void channelRead0(final ChannelHandlerContext clientChannelContext, DefaultSocks5CommandRequest msg)
 				throws Exception {
-			log.debug("目标服务器  : " + msg.type() + "," + msg.dstAddr() + "," + msg.dstPort());
+			log.debug("target server  : " + msg.type() + "," + msg.dstAddr() + "," + msg.dstPort());
 			if (msg.type().equals(Socks5CommandType.CONNECT)) {
-				log.trace("准备连接目标服务器");
+				log.trace("preparing to connect target server");
 				EventLoopGroup bossGroup = new NioEventLoopGroup();
 				Bootstrap bootstrap = new Bootstrap();
 				bootstrap.group(bossGroup)
 						.channel(NioSocketChannel.class)
 						.option(ChannelOption.TCP_NODELAY, true)
+						.option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
 						.handler(new ChannelInitializer<SocketChannel>() {
 							@Override
 							protected void initChannel(SocketChannel ch) throws Exception {
 								//ch.pipeline().addLast(new LoggingHandler());//in out
 								//将目标服务器信息转发给客户端
-								ch.pipeline().addLast(new Dest2ClientHandler(clientChannelContext));
+
+								ChannelPipeline pipeline = ch.pipeline();
+								pipeline.addLast(new IdleStateHandler(3, 30, 0));
+								pipeline.addLast(new ProxyIdleHandler());
+								//logging
+								pipeline.addLast(new LoggingHandler());
+								pipeline.addLast(new Dest2ClientHandler(clientChannelContext));
 							}
 						});
-				log.trace("连接目标服务器");
+				log.trace("start connecting target server");
 				ChannelFuture future = bootstrap.connect(msg.dstAddr(), msg.dstPort());
 				future.addListener(new ChannelFutureListener() {
 
 					public void operationComplete(final ChannelFuture future) throws Exception {
 						if (future.isSuccess()) {
-							log.trace("成功连接目标服务器");
+							log.trace("successfully connected to target server");
 							clientChannelContext.pipeline().addLast(new Client2DestHandler(future));
 							Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(
 									Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);

@@ -70,6 +70,7 @@ public abstract class NettyProxyServer implements ProxyServer {
 					.channel(getChannelClass())
 					.option(ChannelOption.SO_BACKLOG, backLog)
 					.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
+					.option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
 					.childHandler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						protected void initChannel(SocketChannel ch) throws Exception {
