@@ -24,7 +24,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.socksx.SocksVersion;
 import io.netty.handler.codec.socksx.v5.*;
-import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -36,24 +35,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Socks5ProxyServer extends NettyProxyServer {
 
+	private ChannelHandler[] socks5CustomChannelHandlers = new ChannelHandler[] {
+			//Socks5MessageByteBuf
+			Socks5ServerEncoder.DEFAULT,
+			//socks5 init
+			new Socks5InitialRequestDecoder(),
+			new Socks5InitialRequestHandler(),
+			//socks connection
+			new Socks5CommandRequestDecoder(),
+			new Socks5CommandRequestHandler()
+	};
+
 	@Override
-	ChannelHandler getChannelHandler() {
-		return new ChannelInitializer<SocketChannel>() {
-			@Override
-			protected void initChannel(SocketChannel ch) throws Exception {
-				ChannelPipeline pipeline = ch.pipeline();
-				//log
-				pipeline.addLast(new LoggingHandler());
-				//Socks5MessageByteBuf
-				pipeline.addLast(Socks5ServerEncoder.DEFAULT);
-				//sock5 init
-				pipeline.addLast(new Socks5InitialRequestDecoder());
-				pipeline.addLast(new Socks5InitialRequestHandler());
-				//socks connection
-				pipeline.addLast(new Socks5CommandRequestDecoder());
-				pipeline.addLast(new Socks5CommandRequestHandler());
-			}
-		};
+	ChannelHandler[] getCustomChannelHandlers() {
+		return socks5CustomChannelHandlers;
 	}
 
 	@Override
@@ -62,7 +57,6 @@ public class Socks5ProxyServer extends NettyProxyServer {
 	}
 
 	public class Socks5InitialRequestHandler extends SimpleChannelInboundHandler<DefaultSocks5InitialRequest> {
-
 		@Override
 		protected void channelRead0(ChannelHandlerContext ctx, DefaultSocks5InitialRequest msg) throws Exception {
 			log.debug("初始化ss5连接 : " + msg);

@@ -18,11 +18,12 @@ package com.slyak.services.proxy.impl;
 
 import com.slyak.services.proxy.ProxyServer;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ServerChannel;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,10 +37,10 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class NettyProxyServer implements ProxyServer {
 
 	@Setter
-	private int boss = 2;
+	private int boss = 1;
 
 	@Setter
-	private int worker = 0;
+	private int worker = 6;
 
 	@Setter
 	private int backLog = 1024;
@@ -49,6 +50,14 @@ public abstract class NettyProxyServer implements ProxyServer {
 
 	@Setter
 	private int port = 8088;
+
+	private ChannelHandler[] defaultChannelHandlers = new ChannelHandler[] {
+			//channel time out handler
+			new IdleStateHandler(3, 30, 0),
+			new ProxyIdleHandler(),
+			//logging
+			new LoggingHandler()
+	};
 
 	@Override
 	public void start() {
@@ -61,7 +70,17 @@ public abstract class NettyProxyServer implements ProxyServer {
 					.channel(getChannelClass())
 					.option(ChannelOption.SO_BACKLOG, backLog)
 					.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
-					.childHandler(getChannelHandler())
+					.childHandler(new ChannelInitializer<SocketChannel>() {
+						@Override
+						protected void initChannel(SocketChannel ch) throws Exception {
+							ChannelPipeline pipeline = ch.pipeline();
+							pipeline.addLast(defaultChannelHandlers);
+							ChannelHandler[] customChannelHandlers = getCustomChannelHandlers();
+							if (customChannelHandlers != null && customChannelHandlers.length > 0) {
+								pipeline.addLast(customChannelHandlers);
+							}
+						}
+					})
 					.bind(port)
 			;
 			//start server
@@ -82,8 +101,20 @@ public abstract class NettyProxyServer implements ProxyServer {
 	public void stop() {
 	}
 
-	abstract ChannelHandler getChannelHandler();
+	abstract ChannelHandler[] getCustomChannelHandlers();
 
 	abstract Class<? extends ServerChannel> getChannelClass();
+
+	public static class ProxyIdleHandler extends ChannelInboundHandlerAdapter {
+		@Override
+		public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+			if (evt instanceof IdleStateEvent) {
+				ctx.channel().close();
+			}
+			else {
+				super.userEventTriggered(ctx, evt);
+			}
+		}
+	}
 
 }
