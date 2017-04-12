@@ -22,25 +22,6 @@ package com.slyak.services.proxy.server;
  * @author stormning 2017/4/12
  * @since 1.3.0
  */
-public class ProxyConfig {
-
-	private int proxyPort;
-
-	private String proxyAddress;
-
-	public int getProxyPort() {
-		return proxyPort;
-	}
-
-	public void setProxyPort(int proxyPort) {
-		this.proxyPort = proxyPort;
-	}
-
-	public String getProxyAddress() {
-		return proxyAddress;
-	}
-
-	public void setProxyAddress(String proxyAddress) {
-		this.proxyAddress = proxyAddress;
-	}
+public interface AuthProvider {
+	boolean authenticate(String principal, String token);
 }

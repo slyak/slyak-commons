@@ -16,6 +16,7 @@
 
 package com.slyak.services.proxy.server.impl;
 
+import com.slyak.services.proxy.server.AuthProvider;
 import com.slyak.services.proxy.server.ProxyConfig;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -40,24 +41,29 @@ import java.net.InetSocketAddress;
 @Slf4j
 public class Socks5ProxyServer extends NettyProxyServer {
 
-	private ChannelHandler[] socks5CustomChannelHandlers = new ChannelHandler[] {
-			//Socks5MessageByteBuf
-			Socks5ServerEncoder.DEFAULT,
-			//socks5 init
-			new Socks5InitialRequestDecoder(),
-			new Socks5InitialRequestHandler(),
-			//socks connection
-			new Socks5CommandRequestDecoder(),
-			new Socks5CommandRequestHandler()
-	};
-
 	@Override
 	ChannelHandler[] getCustomChannelHandlers() {
-		return socks5CustomChannelHandlers;
+		if (isTunnelMode()) {
+			return null;
+		}
+		//socks auth
+		//new Socks5PasswordAuthRequestDecoder();
+		//new Socks5PasswordAuthRequestHandler()
+		return new ChannelHandler[] {
+				//Socks5MessageByteBuf
+				Socks5ServerEncoder.DEFAULT,
+				//socks5 init
+				new Socks5InitialRequestDecoder(),
+				new Socks5InitialRequestHandler(),
+				//socks connection
+				new Socks5CommandRequestDecoder(),
+				new Socks5CommandRequestHandler()
+		};
 	}
 
 	@Override
 	ProxyHandler getProxyHandler(ProxyConfig proxyConfig) {
+		//TODO username password
 		return new Socks5ProxyHandler(
 				new InetSocketAddress(proxyConfig.getProxyAddress(),
 						proxyConfig.getProxyPort()));
@@ -192,5 +198,33 @@ public class Socks5ProxyServer extends NettyProxyServer {
 				destChannelFuture.channel().close();
 			}
 		}
+	}
+
+	public class Socks5PasswordAuthRequestHandler
+			extends SimpleChannelInboundHandler<DefaultSocks5PasswordAuthRequest> {
+
+		private AuthProvider authProvider;
+
+		public Socks5PasswordAuthRequestHandler(AuthProvider authProvider) {
+			this.authProvider = authProvider;
+		}
+
+		@Override
+		protected void channelRead0(ChannelHandlerContext ctx, DefaultSocks5PasswordAuthRequest msg) throws Exception {
+			if (authProvider.authenticate(msg.username(), msg.password())) {
+//				ProxyChannelTrafficShapingHandler.username(ctx, msg.username());
+				Socks5PasswordAuthResponse passwordAuthResponse = new DefaultSocks5PasswordAuthResponse(
+						Socks5PasswordAuthStatus.SUCCESS);
+				ctx.writeAndFlush(passwordAuthResponse);
+			}
+			else {
+//				ProxyChannelTrafficShapingHandler.username(ctx, "unauthorized");
+				Socks5PasswordAuthResponse passwordAuthResponse = new DefaultSocks5PasswordAuthResponse(
+						Socks5PasswordAuthStatus.FAILURE);
+				//发送鉴权失败消息，完成后关闭channel
+				ctx.writeAndFlush(passwordAuthResponse).addListener(ChannelFutureListener.CLOSE);
+			}
+		}
+
 	}
 }

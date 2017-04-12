@@ -56,15 +56,10 @@ public abstract class NettyProxyServer implements ProxyServer {
 	@Setter
 	private ProxyConfig proxyConfig;
 
-	private ChannelHandler[] defaultChannelHandlers = new ChannelHandler[] {
-			//channel time out handler
-			new IdleStateHandler(3, 30, 0),
-			new ProxyIdleHandler(),
-			//logging
-			new LoggingHandler()
-	};
+	boolean isTunnelMode() {
+		return proxyConfig != null;
+	}
 
-	@Override
 	public void start() {
 		ServerBootstrap bootstrap = new ServerBootstrap();
 		NioEventLoopGroup bossGroup = new NioEventLoopGroup(boss);
@@ -79,16 +74,21 @@ public abstract class NettyProxyServer implements ProxyServer {
 						@Override
 						protected void initChannel(SocketChannel ch) throws Exception {
 							ChannelPipeline pipeline = ch.pipeline();
-							pipeline.addLast(defaultChannelHandlers);
-							if (proxyConfig == null) {
-								separateAdd(pipeline, getCustomChannelHandlers());
+							//channel time out handler
+							pipeline.addLast(new IdleStateHandler(3, 30, 0));
+							pipeline.addLast(new ProxyIdleHandler());
+							//logging
+							pipeline.addLast(new LoggingHandler());
+
+							if (isTunnelMode()) {
+								pipeline.addLast(getProxyHandler(proxyConfig));
 							}
 							else {
-								pipeline.addLast(getProxyHandler(proxyConfig));
+								pipeline.addLast(getCustomChannelHandlers());
 							}
 						}
 					})
-					.bind(port)
+					.bind("192.168.30.176", port)
 			;
 			//start server
 			ChannelFuture future = bootstrap.bind(port).sync();
@@ -101,14 +101,6 @@ public abstract class NettyProxyServer implements ProxyServer {
 		finally {
 			bossGroup.shutdownGracefully();
 			workerGroup.shutdownGracefully();
-		}
-	}
-
-	private void separateAdd(ChannelPipeline pipeline, ChannelHandler[] handlers) {
-		if (handlers != null && handlers.length > 0) {
-			for (ChannelHandler handler : handlers) {
-				pipeline.addLast(handler);
-			}
 		}
 	}
 
