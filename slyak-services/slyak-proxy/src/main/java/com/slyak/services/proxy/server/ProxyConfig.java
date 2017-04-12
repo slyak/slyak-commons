@@ -14,16 +14,35 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy;
+package com.slyak.services.proxy.server;
+
+import java.net.InetAddress;
 
 /**
  * .
  *
- * @author stormning 2017/4/10
+ * @author stormning 2017/4/12
  * @since 1.3.0
  */
-public interface ProxyServer {
-	void start();
+public class ProxyConfig {
 
-	void stop();
+	private int proxyPort;
+
+	private InetAddress proxyAddress;
+
+	public int getProxyPort() {
+		return proxyPort;
+	}
+
+	public void setProxyPort(int proxyPort) {
+		this.proxyPort = proxyPort;
+	}
+
+	public InetAddress getProxyAddress() {
+		return proxyAddress;
+	}
+
+	public void setProxyAddress(InetAddress proxyAddress) {
+		this.proxyAddress = proxyAddress;
+	}
 }

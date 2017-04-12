@@ -14,8 +14,9 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy.impl;
+package com.slyak.services.proxy.server.impl;
 
+import com.slyak.services.proxy.server.ProxyConfig;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -24,7 +25,11 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.socksx.SocksVersion;
 import io.netty.handler.codec.socksx.v5.*;
+import io.netty.handler.proxy.ProxyHandler;
+import io.netty.handler.proxy.Socks5ProxyHandler;
 import lombok.extern.slf4j.Slf4j;
+
+import java.net.InetSocketAddress;
 
 /**
  * .
@@ -49,6 +54,13 @@ public class Socks5ProxyServer extends NettyProxyServer {
 	@Override
 	ChannelHandler[] getCustomChannelHandlers() {
 		return socks5CustomChannelHandlers;
+	}
+
+	@Override
+	ProxyHandler getProxyHandler(ProxyConfig proxyConfig) {
+		return new Socks5ProxyHandler(
+				new InetSocketAddress(proxyConfig.getProxyAddress(),
+						proxyConfig.getProxyPort()));
 	}
 
 	@Override

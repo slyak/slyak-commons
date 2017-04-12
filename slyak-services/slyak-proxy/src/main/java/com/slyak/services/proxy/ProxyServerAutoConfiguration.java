@@ -16,7 +16,8 @@
 
 package com.slyak.services.proxy;
 
-import com.slyak.services.proxy.impl.Socks5ProxyServer;
+import com.slyak.services.proxy.server.ProxyServer;
+import com.slyak.services.proxy.server.impl.Socks5ProxyServer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

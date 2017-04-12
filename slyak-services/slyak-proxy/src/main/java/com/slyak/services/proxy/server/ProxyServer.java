@@ -14,9 +14,7 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy;
-
-import lombok.Data;
+package com.slyak.services.proxy.server;
 
 /**
  * .
@@ -24,11 +22,8 @@ import lombok.Data;
  * @author stormning 2017/4/10
  * @since 1.3.0
  */
-@Data
-public class ProxyProperties {
-	int bossCount;
+public interface ProxyServer {
+	void start();
 
-	int workerCount;
-
-	long connectionTimeOut;
+	void stop();
 }

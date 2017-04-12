@@ -14,14 +14,16 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy.impl;
+package com.slyak.services.proxy.server.impl;
 
-import com.slyak.services.proxy.ProxyServer;
+import com.slyak.services.proxy.server.ProxyConfig;
+import com.slyak.services.proxy.server.ProxyServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.proxy.ProxyHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Setter;
@@ -49,7 +51,10 @@ public abstract class NettyProxyServer implements ProxyServer {
 	private int connectTimeout = 1000;
 
 	@Setter
-	private int port = 8088;
+	private int port = 9999;
+
+	@Setter
+	private ProxyConfig proxyConfig;
 
 	private ChannelHandler[] defaultChannelHandlers = new ChannelHandler[] {
 			//channel time out handler
@@ -75,9 +80,11 @@ public abstract class NettyProxyServer implements ProxyServer {
 						protected void initChannel(SocketChannel ch) throws Exception {
 							ChannelPipeline pipeline = ch.pipeline();
 							pipeline.addLast(defaultChannelHandlers);
-							ChannelHandler[] customChannelHandlers = getCustomChannelHandlers();
-							if (customChannelHandlers != null && customChannelHandlers.length > 0) {
-								pipeline.addLast(customChannelHandlers);
+							if (proxyConfig == null) {
+								separateAdd(pipeline, getCustomChannelHandlers());
+							}
+							else {
+								pipeline.addLast(getProxyHandler(proxyConfig));
 							}
 						}
 					})
@@ -97,11 +104,21 @@ public abstract class NettyProxyServer implements ProxyServer {
 		}
 	}
 
+	private void separateAdd(ChannelPipeline pipeline, ChannelHandler[] handlers) {
+		if (handlers != null && handlers.length > 0) {
+			for (ChannelHandler handler : handlers) {
+				pipeline.addLast(handler);
+			}
+		}
+	}
+
 	@Override
 	public void stop() {
 	}
 
 	abstract ChannelHandler[] getCustomChannelHandlers();
+
+	abstract ProxyHandler getProxyHandler(ProxyConfig proxyConfig);
 
 	abstract Class<? extends ServerChannel> getChannelClass();
 
@@ -116,5 +133,4 @@ public abstract class NettyProxyServer implements ProxyServer {
 			}
 		}
 	}
-
 }
