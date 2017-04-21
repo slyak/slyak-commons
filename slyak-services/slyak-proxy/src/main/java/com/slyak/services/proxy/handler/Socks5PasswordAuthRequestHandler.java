@@ -16,7 +16,7 @@
 
 package com.slyak.services.proxy.handler;
 
-import com.slyak.services.proxy.AuthProvider;
+import com.slyak.services.proxy.auth.AuthProvider;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

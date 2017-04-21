@@ -16,7 +16,10 @@
 
 package com.slyak.services.proxy.handler;
 
-import io.netty.channel.*;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * .
@@ -25,6 +28,7 @@ import io.netty.channel.*;
  * @since 1.3.0
  */
 @ChannelHandler.Sharable
+@Slf4j
 public class ExceptionHandler extends ChannelDuplexHandler {
 	private ExceptionHandler() {
 	}
@@ -34,35 +38,7 @@ public class ExceptionHandler extends ChannelDuplexHandler {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		cause.printStackTrace();
+		log.error("exception caught", cause);
 		ctx.close();
 	}
-
-	/*@Override
-	public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
-			ChannelPromise promise) throws Exception {
-		ctx.connect(remoteAddress, localAddress, promise.addListener(new ChannelFutureListener() {
-			@Override
-			public void operationComplete(ChannelFuture future) {
-				if (!future.isSuccess()) {
-					// Handle connect exception here...
-					future.channel().closeFuture();
-				}
-			}
-		}));
-	}
-
-	@Override
-	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
-		ctx.write(msg, promise.addListener(new ChannelFutureListener() {
-			@Override
-			public void operationComplete(ChannelFuture future) {
-				if (!future.isSuccess()) {
-					// Handle write exception here...
-					future.channel().closeFuture();
-				}
-			}
-		}));
-	}*/
-
-	// ... override more outbound methods to handle their exceptions as well
 }

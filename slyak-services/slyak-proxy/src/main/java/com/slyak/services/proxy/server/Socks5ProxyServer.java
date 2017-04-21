@@ -14,9 +14,9 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy.impl;
+package com.slyak.services.proxy.server;
 
-import com.slyak.services.proxy.ProxyConfig;
+import com.slyak.services.proxy.config.ProxyProperties;
 import com.slyak.services.proxy.handler.Socks5CommandRequestHandler;
 import com.slyak.services.proxy.handler.Socks5InitialRequestHandler;
 import io.netty.channel.ChannelHandler;
@@ -63,10 +63,10 @@ public class Socks5ProxyServer extends NettyProxyServer {
 	}
 
 	@Override
-	ProxyHandler getProxyHandler(ProxyConfig proxyConfig) {
+	ProxyHandler getProxyHandler(ProxyProperties proxyProperties) {
 		return new Socks5ProxyHandler(
-				new InetSocketAddress(proxyConfig.getProxyAddress(),
-						proxyConfig.getProxyPort()));
+				new InetSocketAddress(proxyProperties.getProxyAddress(),
+						proxyProperties.getProxyPort()));
 	}
 
 	@Override

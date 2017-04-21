@@ -14,16 +14,14 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy;
+package com.slyak.services.proxy.auth;
 
 /**
  * .
  *
- * @author stormning 2017/4/10
+ * @author stormning 2017/4/12
  * @since 1.3.0
  */
-public interface ProxyServer {
-	void start();
-
-	void stop();
+public interface AuthProvider {
+	boolean authenticate(String principal, String token);
 }

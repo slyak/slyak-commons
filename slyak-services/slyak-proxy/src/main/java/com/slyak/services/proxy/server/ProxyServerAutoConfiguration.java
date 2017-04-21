@@ -14,14 +14,25 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy;
+package com.slyak.services.proxy.server;
+
+import com.slyak.services.proxy.config.ProxyProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * .
  *
- * @author stormning 2017/4/12
+ * @author stormning 2017/4/11
  * @since 1.3.0
  */
-public interface AuthProvider {
-	boolean authenticate(String principal, String token);
+@Configuration
+public class ProxyServerAutoConfiguration {
+
+	@Bean(destroyMethod = "stop", initMethod = "start")
+	ProxyServer socks5ProxyServer(ProxyProperties proxyProperties) {
+		Socks5ProxyServer proxyServer = new Socks5ProxyServer();
+		proxyServer.setProxyProperties(proxyProperties);
+		return proxyServer;
+	}
 }

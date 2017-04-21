@@ -14,10 +14,9 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy.impl;
+package com.slyak.services.proxy.server;
 
-import com.slyak.services.proxy.ProxyConfig;
-import com.slyak.services.proxy.ProxyServer;
+import com.slyak.services.proxy.config.ProxyProperties;
 import com.slyak.services.proxy.handler.ExceptionHandler;
 import com.slyak.services.proxy.handler.IdleEventHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -42,25 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class NettyProxyServer implements ProxyServer {
 
 	@Setter
-	private int boss = 1;
-
-	@Setter
-	private int worker = 5;
-
-	@Setter
-	private int client = 5;
-
-	@Setter
-	private int backLog = 1024;
-
-	@Setter
-	private int connectTimeout = 1000;
-
-	@Setter
-	private int port = 9999;
-
-	@Setter
-	private ProxyConfig proxyConfig;
+	private ProxyProperties proxyProperties;
 
 	private NioEventLoopGroup bossGroup;
 
@@ -69,22 +50,22 @@ public abstract class NettyProxyServer implements ProxyServer {
 	private NioEventLoopGroup clientGroup;
 
 	boolean isTunnelMode() {
-		return proxyConfig != null;
+		return proxyProperties != null;
 	}
 
 	@SneakyThrows(InterruptedException.class)
 	public void start() {
 		ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
 		ServerBootstrap bootstrap = new ServerBootstrap();
-		bossGroup = new NioEventLoopGroup(boss);
-		workerGroup = new NioEventLoopGroup(worker);
-		clientGroup = new NioEventLoopGroup(client);
+		bossGroup = new NioEventLoopGroup(proxyProperties.getBoss());
+		workerGroup = new NioEventLoopGroup(proxyProperties.getWorker());
+		clientGroup = new NioEventLoopGroup(proxyProperties.getClient());
 		try {
 			bootstrap
 					.group(bossGroup, workerGroup)
 					.channel(getChannelClass())
-					.option(ChannelOption.SO_BACKLOG, backLog)
-					.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
+					.option(ChannelOption.SO_BACKLOG, proxyProperties.getBackLog())
+					.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, proxyProperties.getConnectTimeout())
 
 					.childOption(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
 					.childOption(ChannelOption.TCP_NODELAY, true)
@@ -101,19 +82,17 @@ public abstract class NettyProxyServer implements ProxyServer {
 							pipeline.addLast(new LoggingHandler());
 
 							if (isTunnelMode()) {
-								pipeline.addLast(getProxyHandler(proxyConfig));
+								pipeline.addLast(getProxyHandler(proxyProperties));
 							}
 							else {
 								pipeline.addLast(getCustomChannelHandlers(ch, clientGroup));
 							}
 							pipeline.addLast(ExceptionHandler.INSTANCE);
 						}
-					})
-					.bind("192.168.30.176", port)
-			;
+					});
 			//start server
-			ChannelFuture future = bootstrap.bind(port).sync();
-			log.debug("Starting proxy server , port is {}", port);
+			ChannelFuture future = bootstrap.bind(proxyProperties.getPort()).sync();
+			log.debug("Starting proxy server , port is {}", proxyProperties.getPort());
 			future.channel().closeFuture().sync();
 		}
 		finally {
@@ -131,7 +110,7 @@ public abstract class NettyProxyServer implements ProxyServer {
 
 	abstract ChannelHandler[] getCustomChannelHandlers(SocketChannel channel, EventLoopGroup clientGroup);
 
-	abstract ProxyHandler getProxyHandler(ProxyConfig proxyConfig);
+	abstract ProxyHandler getProxyHandler(ProxyProperties proxyProperties);
 
 	abstract Class<? extends ServerChannel> getChannelClass();
 }

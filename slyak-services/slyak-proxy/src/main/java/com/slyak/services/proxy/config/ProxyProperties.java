@@ -14,7 +14,10 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy;
+package com.slyak.services.proxy.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * .
@@ -22,25 +25,23 @@ package com.slyak.services.proxy;
  * @author stormning 2017/4/12
  * @since 1.3.0
  */
-public class ProxyConfig {
+@Data
+@ConfigurationProperties(prefix = "proxy")
+public class ProxyProperties {
+
+	private int boss = 1;
+
+	private int worker = 5;
+
+	private int client = 5;
+
+	private int backLog = 1024;
+
+	private int connectTimeout = 1000;
+
+	private int port = 10608;
 
 	private int proxyPort;
 
 	private String proxyAddress;
-
-	public int getProxyPort() {
-		return proxyPort;
-	}
-
-	public void setProxyPort(int proxyPort) {
-		this.proxyPort = proxyPort;
-	}
-
-	public String getProxyAddress() {
-		return proxyAddress;
-	}
-
-	public void setProxyAddress(String proxyAddress) {
-		this.proxyAddress = proxyAddress;
-	}
 }
