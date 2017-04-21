@@ -50,7 +50,7 @@ public abstract class NettyProxyServer implements ProxyServer {
 	private NioEventLoopGroup clientGroup;
 
 	boolean isTunnelMode() {
-		return proxyProperties != null;
+		return proxyProperties.hasProxy();
 	}
 
 	@SneakyThrows(InterruptedException.class)

@@ -44,4 +44,8 @@ public class ProxyProperties {
 	private int proxyPort;
 
 	private String proxyAddress;
+
+	public boolean hasProxy() {
+		return proxyAddress != null && proxyPort > 0;
+	}
 }
