@@ -14,14 +14,20 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy.server;
+package com.slyak.services.proxy.handler;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * .
  *
- * @author stormning 2017/4/12
+ * @author stormning 2017/4/21
  * @since 1.3.0
  */
-
-public class ProxyServerProperties {
+public class Client2DestHandler extends SimpleChannelInboundHandler {
+	@Override
+	protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+		ctx.writeAndFlush(msg);
+	}
 }

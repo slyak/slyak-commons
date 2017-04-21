@@ -16,21 +16,14 @@
 
 package com.slyak.services.proxy;
 
-import com.slyak.services.proxy.impl.Socks5ProxyServer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 /**
  * .
  *
- * @author stormning 2017/4/11
+ * @author stormning 2017/4/10
  * @since 1.3.0
  */
-@Configuration
-public class ProxyServerAutoConfiguration {
+public interface ProxyServer {
+	void start();
 
-	@Bean(destroyMethod = "stop", initMethod = "start")
-	ProxyServer socks5ProxyServer() {
-		return new Socks5ProxyServer();
-	}
+	void stop();
 }

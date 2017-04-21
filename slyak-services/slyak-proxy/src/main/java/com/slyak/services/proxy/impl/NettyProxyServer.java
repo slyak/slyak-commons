@@ -14,19 +14,22 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy.server.impl;
+package com.slyak.services.proxy.impl;
 
-import com.slyak.services.proxy.server.ProxyConfig;
-import com.slyak.services.proxy.server.ProxyServer;
+import com.slyak.services.proxy.ProxyConfig;
+import com.slyak.services.proxy.ProxyServer;
+import com.slyak.services.proxy.handler.ExceptionHandler;
+import com.slyak.services.proxy.handler.IdleEventHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.proxy.ProxyHandler;
-import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.ResourceLeakDetector;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -42,7 +45,10 @@ public abstract class NettyProxyServer implements ProxyServer {
 	private int boss = 1;
 
 	@Setter
-	private int worker = 6;
+	private int worker = 5;
+
+	@Setter
+	private int client = 5;
 
 	@Setter
 	private int backLog = 1024;
@@ -56,28 +62,41 @@ public abstract class NettyProxyServer implements ProxyServer {
 	@Setter
 	private ProxyConfig proxyConfig;
 
+	private NioEventLoopGroup bossGroup;
+
+	private NioEventLoopGroup workerGroup;
+
+	private NioEventLoopGroup clientGroup;
+
 	boolean isTunnelMode() {
 		return proxyConfig != null;
 	}
 
+	@SneakyThrows(InterruptedException.class)
 	public void start() {
+		ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
 		ServerBootstrap bootstrap = new ServerBootstrap();
-		NioEventLoopGroup bossGroup = new NioEventLoopGroup(boss);
-		NioEventLoopGroup workerGroup = new NioEventLoopGroup(worker);
+		bossGroup = new NioEventLoopGroup(boss);
+		workerGroup = new NioEventLoopGroup(worker);
+		clientGroup = new NioEventLoopGroup(client);
 		try {
 			bootstrap
 					.group(bossGroup, workerGroup)
 					.channel(getChannelClass())
 					.option(ChannelOption.SO_BACKLOG, backLog)
 					.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
-					.option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
+
+					.childOption(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
+					.childOption(ChannelOption.TCP_NODELAY, true)
+					.childOption(ChannelOption.SO_REUSEADDR, true)
+
 					.childHandler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						protected void initChannel(SocketChannel ch) throws Exception {
 							ChannelPipeline pipeline = ch.pipeline();
 							//channel time out handler
-							pipeline.addLast(new IdleStateHandler(3, 30, 0));
-							pipeline.addLast(new ProxyIdleHandler());
+							pipeline.addLast(new IdleStateHandler(0, 0, 30));
+							pipeline.addLast(new IdleEventHandler());
 							//logging
 							pipeline.addLast(new LoggingHandler());
 
@@ -85,8 +104,9 @@ public abstract class NettyProxyServer implements ProxyServer {
 								pipeline.addLast(getProxyHandler(proxyConfig));
 							}
 							else {
-								pipeline.addLast(getCustomChannelHandlers());
+								pipeline.addLast(getCustomChannelHandlers(ch, clientGroup));
 							}
+							pipeline.addLast(ExceptionHandler.INSTANCE);
 						}
 					})
 					.bind("192.168.30.176", port)
@@ -96,34 +116,22 @@ public abstract class NettyProxyServer implements ProxyServer {
 			log.debug("Starting proxy server , port is {}", port);
 			future.channel().closeFuture().sync();
 		}
-		catch (InterruptedException e) {
-			log.error("An error occurred when starting netty proxy server.", e);
-		}
 		finally {
-			bossGroup.shutdownGracefully();
-			workerGroup.shutdownGracefully();
+			stop();
 		}
 	}
 
 	@Override
+	@SneakyThrows(InterruptedException.class)
 	public void stop() {
+		clientGroup.shutdownGracefully().sync();
+		workerGroup.shutdownGracefully().sync();
+		bossGroup.shutdownGracefully().sync();
 	}
 
-	abstract ChannelHandler[] getCustomChannelHandlers();
+	abstract ChannelHandler[] getCustomChannelHandlers(SocketChannel channel, EventLoopGroup clientGroup);
 
 	abstract ProxyHandler getProxyHandler(ProxyConfig proxyConfig);
 
 	abstract Class<? extends ServerChannel> getChannelClass();
-
-	public static class ProxyIdleHandler extends ChannelInboundHandlerAdapter {
-		@Override
-		public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-			if (evt instanceof IdleStateEvent) {
-				ctx.channel().close();
-			}
-			else {
-				super.userEventTriggered(ctx, evt);
-			}
-		}
-	}
 }

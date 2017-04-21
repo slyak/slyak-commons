@@ -16,21 +16,31 @@
 
 package com.slyak.services.proxy;
 
-import com.slyak.services.proxy.impl.Socks5ProxyServer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 /**
  * .
  *
- * @author stormning 2017/4/11
+ * @author stormning 2017/4/12
  * @since 1.3.0
  */
-@Configuration
-public class ProxyServerAutoConfiguration {
+public class ProxyConfig {
 
-	@Bean(destroyMethod = "stop", initMethod = "start")
-	ProxyServer socks5ProxyServer() {
-		return new Socks5ProxyServer();
+	private int proxyPort;
+
+	private String proxyAddress;
+
+	public int getProxyPort() {
+		return proxyPort;
+	}
+
+	public void setProxyPort(int proxyPort) {
+		this.proxyPort = proxyPort;
+	}
+
+	public String getProxyAddress() {
+		return proxyAddress;
+	}
+
+	public void setProxyAddress(String proxyAddress) {
+		this.proxyAddress = proxyAddress;
 	}
 }

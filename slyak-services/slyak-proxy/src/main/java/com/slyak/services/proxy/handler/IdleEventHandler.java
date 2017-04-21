@@ -14,14 +14,28 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy.server;
+package com.slyak.services.proxy.handler;
+
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleStateEvent;
 
 /**
  * .
  *
- * @author stormning 2017/4/12
+ * @author stormning 2017/4/21
  * @since 1.3.0
  */
-public interface AuthProvider {
-	boolean authenticate(String principal, String token);
+@ChannelHandler.Sharable
+public class IdleEventHandler extends ChannelInboundHandlerAdapter {
+	@Override
+	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+		if (evt instanceof IdleStateEvent) {
+			ctx.channel().close();
+		}
+		else {
+			super.userEventTriggered(ctx, evt);
+		}
+	}
 }

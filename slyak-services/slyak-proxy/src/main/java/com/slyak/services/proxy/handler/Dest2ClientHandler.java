@@ -14,33 +14,22 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.proxy.server;
+package com.slyak.services.proxy.handler;
+
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * .
  *
- * @author stormning 2017/4/12
+ * @author stormning 2017/4/21
  * @since 1.3.0
  */
-public class ProxyConfig {
-
-	private int proxyPort;
-
-	private String proxyAddress;
-
-	public int getProxyPort() {
-		return proxyPort;
-	}
-
-	public void setProxyPort(int proxyPort) {
-		this.proxyPort = proxyPort;
-	}
-
-	public String getProxyAddress() {
-		return proxyAddress;
-	}
-
-	public void setProxyAddress(String proxyAddress) {
-		this.proxyAddress = proxyAddress;
+@ChannelHandler.Sharable
+public class Dest2ClientHandler extends SimpleChannelInboundHandler {
+	@Override
+	protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+		ctx.writeAndFlush(msg);
 	}
 }
