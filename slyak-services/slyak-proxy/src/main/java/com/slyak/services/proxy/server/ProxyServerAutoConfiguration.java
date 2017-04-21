@@ -17,6 +17,7 @@
 package com.slyak.services.proxy.server;
 
 import com.slyak.services.proxy.config.ProxyProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 1.3.0
  */
 @Configuration
+@EnableConfigurationProperties(ProxyProperties.class)
 public class ProxyServerAutoConfiguration {
 
 	@Bean(destroyMethod = "stop", initMethod = "start")
