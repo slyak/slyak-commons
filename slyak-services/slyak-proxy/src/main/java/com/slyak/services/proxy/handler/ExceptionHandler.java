@@ -38,6 +38,6 @@ public class ExceptionHandler extends ChannelDuplexHandler {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		log.error("exception caught", cause);
-		ctx.close();
+		ctx.channel().closeFuture();
 	}
 }
