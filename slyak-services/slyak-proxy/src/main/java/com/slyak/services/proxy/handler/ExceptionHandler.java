@@ -37,7 +37,6 @@ public class ExceptionHandler extends ChannelDuplexHandler {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		cause.printStackTrace();
 		log.error("exception caught", cause);
 		ctx.close();
 	}
