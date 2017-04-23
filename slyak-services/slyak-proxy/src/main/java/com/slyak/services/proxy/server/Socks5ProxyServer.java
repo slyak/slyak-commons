@@ -19,6 +19,7 @@ package com.slyak.services.proxy.server;
 import com.slyak.services.proxy.config.ProxyProperties;
 import com.slyak.services.proxy.handler.Socks5CommandRequestHandler;
 import com.slyak.services.proxy.handler.Socks5InitialRequestHandler;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
@@ -43,10 +44,7 @@ import java.net.InetSocketAddress;
 public class Socks5ProxyServer extends NettyProxyServer {
 
 	@Override
-	ChannelHandler[] getCustomChannelHandlers(SocketChannel channel, EventLoopGroup clientGroup) {
-		if (isTunnelMode()) {
-			return null;
-		}
+	ChannelHandler[] getCustomChannelHandlers(EventLoopGroup clientGroup) {
 		//socks auth
 		//new Socks5PasswordAuthRequestDecoder();
 		//new Socks5PasswordAuthRequestHandler()
@@ -58,7 +56,7 @@ public class Socks5ProxyServer extends NettyProxyServer {
 				new Socks5InitialRequestHandler(),
 				//socks connection
 				new Socks5CommandRequestDecoder(),
-				Socks5CommandRequestHandler.builder().parent(channel).group(clientGroup).build()
+				new Socks5CommandRequestHandler(clientGroup)
 		};
 	}
 

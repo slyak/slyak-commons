@@ -22,7 +22,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.socksx.v5.*;
 import io.netty.handler.timeout.IdleStateHandler;
-import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * .
@@ -30,20 +30,26 @@ import lombok.Builder;
  * @author stormning 2017/4/21
  * @since 1.3.0
  */
-@Builder
+@Slf4j
 public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<DefaultSocks5CommandRequest> {
 
-	private EventLoopGroup group;
+	private EventLoopGroup remoteEventLoopGroup;
 
-	private SocketChannel parent;
+	public Socks5CommandRequestHandler(EventLoopGroup remoteEventLoopGroup) {
+		this.remoteEventLoopGroup = remoteEventLoopGroup;
+	}
+
+	private Channel remoteChannel;
 
 	@Override
-	protected void channelRead0(final ChannelHandlerContext ctx, final DefaultSocks5CommandRequest msg)
+	protected void channelRead0(final ChannelHandlerContext requestChannelContext,
+			final DefaultSocks5CommandRequest msg)
 			throws Exception {
 		if (Socks5CommandType.CONNECT.equals(msg.type())) {
+			log.debug("Start to connect remote server : {}:{}", msg.dstAddr(), msg.dstPort());
 			Bootstrap bootstrap = new Bootstrap();
 			bootstrap
-					.group(group)
+					.group(remoteEventLoopGroup)
 					.channel(NioSocketChannel.class)
 					.handler(new ChannelInitializer<SocketChannel>() {
 						@Override
@@ -51,37 +57,94 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 							ChannelPipeline pipeline = ch.pipeline();
 							pipeline.addLast(new IdleStateHandler(0, 0, 30));
 							pipeline.addLast(new IdleEventHandler());
-							pipeline.addLast(new Dest2ClientHandler());
+							pipeline.addLast(ExceptionHandler.INSTANCE);
+							pipeline.addLast(new Remote2RequestHandler(requestChannelContext.channel()));
 							pipeline.addLast(ExceptionHandler.INSTANCE);
 						}
 					});
-			ChannelFuture future = bootstrap.connect(msg.dstAddr(), msg.dstPort());
+			final ChannelFuture future = bootstrap.connect(msg.dstAddr(), msg.dstPort());
+			this.remoteChannel = future.channel();
 			future.addListener(new ChannelFutureListener() {
-				@Override
-				public void operationComplete(ChannelFuture future) throws Exception {
-					try {
-						if (future.isSuccess()) {
-							Socks5CommandResponse response = new DefaultSocks5CommandResponse(
-									Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
-							ctx.writeAndFlush(response);
-
-							//add client to dest handler to receive response
-							ctx.pipeline().addLast(new Client2DestHandler());
-						}
-						else {
-							Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(
-									Socks5CommandStatus.FAILURE, Socks5AddressType.IPv4);
-							ctx.writeAndFlush(commandResponse);
-						}
-					}
-					finally {
-						future.channel().close();
-						if (parent != null && parent.isActive()) {
-							parent.closeFuture();
-						}
-					}
-				}
-			});
+								   @Override
+								   public void operationComplete(final ChannelFuture connectFuture) throws Exception {
+									   if (connectFuture.isSuccess()) {
+										   log.debug("Connected to remote server");
+										   requestChannelContext.pipeline().addLast(new Request2RemoteHandler(remoteChannel));
+										   Socks5CommandResponse response = new DefaultSocks5CommandResponse(
+												   Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
+										   //add client to dest handler to receive response
+										   requestChannelContext.writeAndFlush(response);
+									   }
+									   else {
+										   log.debug("Failed to connect to remote server");
+										   Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(
+												   Socks5CommandStatus.FAILURE, Socks5AddressType.IPv4);
+										   requestChannelContext.writeAndFlush(commandResponse);
+									   }
+								   }
+							   }
+			);
 		}
+		else {
+			log.debug("Fire channel read");
+			requestChannelContext.fireChannelRead(msg);
+		}
+	}
+
+	/**
+	 * Send remote response msg to request channel
+	 */
+	private static class Remote2RequestHandler extends ChannelInboundHandlerAdapter {
+
+		private Channel requestChannel;
+
+		public Remote2RequestHandler(Channel requestChannel) {
+			this.requestChannel = requestChannel;
+		}
+
+		@Override
+		public void channelRead(ChannelHandlerContext ctx, Object remoteResponseMsg) throws Exception {
+			log.debug("Received remote msg,and write it to request channel");
+			requestChannel.writeAndFlush(remoteResponseMsg);
+		}
+
+		@Override
+		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+			ctx.channel().close();
+			requestChannel.close();
+		}
+	}
+
+	/**
+	 * Send decoded request to remote
+	 */
+	public class Request2RemoteHandler extends ChannelInboundHandlerAdapter {
+		private final Channel remoteChannel;
+
+		public Request2RemoteHandler(Channel remoteChannel) {
+			this.remoteChannel = remoteChannel;
+		}
+
+		/**
+		 * read msg from request channel,and write it to remote channel
+		 *
+		 * @param ctx request channel context
+		 * @param msg decoded request msg
+		 * @throws Exception
+		 */
+		@Override
+		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+			log.debug("Start to send request to remote");
+			remoteChannel.writeAndFlush(msg);
+		}
+
+		@Override
+		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+			//close remote channel
+			remoteChannel.close();
+			//close request channel
+			ctx.channel().close();
+		}
+
 	}
 }

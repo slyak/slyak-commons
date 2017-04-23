@@ -49,8 +49,8 @@ public abstract class NettyProxyServer implements ProxyServer {
 
 	private NioEventLoopGroup clientGroup;
 
-	boolean isTunnelMode() {
-		return proxyProperties.hasProxy();
+	boolean isRouter() {
+		return proxyProperties.getProxyAddress() != null && proxyProperties.getPort() > 0;
 	}
 
 	@SneakyThrows(InterruptedException.class)
@@ -67,7 +67,6 @@ public abstract class NettyProxyServer implements ProxyServer {
 					.option(ChannelOption.SO_BACKLOG, proxyProperties.getBackLog())
 					.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, proxyProperties.getConnectTimeout())
 
-					.childOption(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
 					.childOption(ChannelOption.TCP_NODELAY, true)
 					.childOption(ChannelOption.SO_REUSEADDR, true)
 
@@ -75,17 +74,18 @@ public abstract class NettyProxyServer implements ProxyServer {
 						@Override
 						protected void initChannel(SocketChannel ch) throws Exception {
 							ChannelPipeline pipeline = ch.pipeline();
+							pipeline.addLast(ExceptionHandler.INSTANCE);
 							//channel time out handler
 							pipeline.addLast(new IdleStateHandler(0, 0, 30));
 							pipeline.addLast(new IdleEventHandler());
 							//logging
 							pipeline.addLast(new LoggingHandler());
 
-							if (isTunnelMode()) {
+							if (isRouter()) {
 								pipeline.addLast(getProxyHandler(proxyProperties));
 							}
 							else {
-								pipeline.addLast(getCustomChannelHandlers(ch, clientGroup));
+								pipeline.addLast(getCustomChannelHandlers(clientGroup));
 							}
 							pipeline.addLast(ExceptionHandler.INSTANCE);
 						}
@@ -108,7 +108,7 @@ public abstract class NettyProxyServer implements ProxyServer {
 		bossGroup.shutdownGracefully().sync();
 	}
 
-	abstract ChannelHandler[] getCustomChannelHandlers(SocketChannel channel, EventLoopGroup clientGroup);
+	abstract ChannelHandler[] getCustomChannelHandlers(EventLoopGroup clientGroup);
 
 	abstract ProxyHandler getProxyHandler(ProxyProperties proxyProperties);
 
