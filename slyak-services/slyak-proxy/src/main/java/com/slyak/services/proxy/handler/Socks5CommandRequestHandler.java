@@ -57,7 +57,6 @@ public class Socks5CommandRequestHandler extends SimpleChannelInboundHandler<Def
 							ChannelPipeline pipeline = ch.pipeline();
 							pipeline.addLast(new IdleStateHandler(0, 0, 30));
 							pipeline.addLast(new IdleEventHandler());
-							pipeline.addLast(ExceptionHandler.INSTANCE);
 							pipeline.addLast(new Remote2RequestHandler(requestChannelContext.channel()));
 							pipeline.addLast(ExceptionHandler.INSTANCE);
 						}

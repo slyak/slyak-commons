@@ -74,7 +74,6 @@ public abstract class NettyProxyServer implements ProxyServer {
 						@Override
 						protected void initChannel(SocketChannel ch) throws Exception {
 							ChannelPipeline pipeline = ch.pipeline();
-							pipeline.addLast(ExceptionHandler.INSTANCE);
 							//channel time out handler
 							pipeline.addLast(new IdleStateHandler(0, 0, 30));
 							pipeline.addLast(new IdleEventHandler());
