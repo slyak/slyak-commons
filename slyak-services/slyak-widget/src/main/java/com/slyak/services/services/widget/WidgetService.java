@@ -14,17 +14,22 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.registry;
+package com.slyak.services.services.widget;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * .
  *
- * @author stormning 2017/3/30
+ * @author stormning 2017/4/11
  * @since 1.3.0
  */
-@SpringBootApplication
-public class Application {
+public interface WidgetService {
+	/**
+	 * @param instances
+	 */
+	void configure(Collection<Instance> instances);
 
+	List<Instance> listInstances();
 }

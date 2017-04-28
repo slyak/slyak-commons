@@ -14,22 +14,17 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.widget;
+package com.slyak.services.services.registry.config;
 
-import java.util.Collection;
-import java.util.List;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 /**
  * .
  *
- * @author stormning 2017/4/11
+ * @author stormning 2017/3/30
  * @since 1.3.0
  */
-public interface WidgetService {
-	/**
-	 * @param instances
-	 */
-	void configure(Collection<Instance> instances);
+@EnableEurekaServer
+public class EurekaServerConfig {
 
-	List<Instance> listInstances();
 }

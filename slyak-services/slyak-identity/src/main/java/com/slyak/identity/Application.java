@@ -14,17 +14,13 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.registry.config;
-
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+package com.slyak.identity;
 
 /**
  * .
  *
- * @author stormning 2017/3/30
- * @since 1.3.0
+ * @author stormning 2017/3/22
+ * @since 1.0.0
  */
-@EnableEurekaServer
-public class EurekaServerConfig {
-
+public class Application {
 }

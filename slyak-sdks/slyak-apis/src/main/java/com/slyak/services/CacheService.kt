@@ -14,23 +14,35 @@
  *  limitations under the License.
  */
 
-package com.slyak.gateway;
-
-import com.slyak.services.CacheService;
-import com.slyak.services.UserInfo;
+package com.slyak.services
 
 /**
- * .
+ * 缓存服务.
  *
- * @author stormning 2017/3/22
- * @since 1.0.0
+ * @author stormning 2017/4/28
+ * @since 1.3.0
  */
-public class Application {
 
-	private CacheService cacheService;
+interface CacheService {
+    /**
+     * 设置缓存
+     * @param key 键
+     * @param
+     * @param ttl 发呆时间
+     */
+    fun put(key: String, value: Any, ttl: Long? = -1)
 
+    /**
+     * 获取缓存
+     * @param key 键
+     */
+    fun <T> get(key: String): T
 
-	private void t(){
-		UserInfo u = cacheService.get("a");
-	}
+    /**
+     * 命中一下，如果允许的话返回true
+     * @param key 键
+     * @param maxHit 最大命中数
+     * @param period 时间段
+     */
+    fun hit(key: String, maxHit: Int, period: Long): Boolean
 }

@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.slyak.commons.services.widget;
+package com.slyak.services.services.widget;
 
 import lombok.Data;
 

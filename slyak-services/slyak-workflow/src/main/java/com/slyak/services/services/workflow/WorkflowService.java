@@ -14,23 +14,14 @@
  *  limitations under the License.
  */
 
-package com.slyak.gateway;
-
-import com.slyak.services.CacheService;
-import com.slyak.services.UserInfo;
+package com.slyak.services.services.workflow;
 
 /**
  * .
  *
- * @author stormning 2017/3/22
- * @since 1.0.0
+ * @author stormning 2017/4/11
+ * @since 1.3.0
  */
-public class Application {
+public interface WorkflowService {
 
-	private CacheService cacheService;
-
-
-	private void t(){
-		UserInfo u = cacheService.get("a");
-	}
 }
