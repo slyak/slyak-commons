@@ -14,13 +14,27 @@
  *  limitations under the License.
  */
 
-package com.slyak.core.support.cloud;
+package com.slyak.core.support.cloud.netflix.feign;
+
+import feign.Feign;
+import feign.RequestInterceptor;
+import feign.Retryer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
+
+import java.util.List;
 
 /**
  * .
  *
- * @author stormning on 2017/1/16.
+ * @author stormning 2017/5/2
+ * @since 1.3.0
  */
-public interface ServiceIdProvider {
-	String getCurrentServiceId();
+public class OverrideFeignClientsConfiguration {
+
+	@Bean
+	@Scope("prototype")
+	public Feign.Builder feignBuilder(List<RequestInterceptor> interceptors, Retryer retryer) {
+		return Feign.builder().requestInterceptors(interceptors).retryer(retryer);
+	}
 }

@@ -17,11 +17,10 @@
 package com.slyak.services
 
 import org.springframework.cloud.netflix.feign.FeignClient
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.ResponseStatus
 
 /**
  * 身份认证服务.
@@ -48,6 +47,14 @@ open class ChangePwdReq {
 }
 
 /**
+ * 修改状态请求
+ */
+open class ChangeStatusReq {
+    var userIds: Set<Long> = null!!
+    var status: Int = null!!
+}
+
+/**
  * 安全修改密码请求
  */
 class SafeChangePwdReq : ChangePwdReq() {
@@ -58,15 +65,13 @@ class SafeChangePwdReq : ChangePwdReq() {
  * 基本用户
  */
 open class BaseUser {
+    //编号
     var id: Long? = null
-    /**
-     * 登陆名
-     */
-    var loginName: String = null!!
 
-    /**
-     * 状态
-     */
+    //真实姓名
+    var realName: String? = null
+
+    //状态
     var status: Int = 0
 }
 
@@ -78,7 +83,7 @@ class User : BaseUser() {
 }
 
 enum class AccountType(val title: String) {
-    PRIMARY("系统主账号"),
+    MAIL("邮箱"),
     QQ("QQ"),
     WEI_BO("微博"),
     WEI_XIN("微信"),
@@ -86,11 +91,19 @@ enum class AccountType(val title: String) {
 }
 
 /**
- * 账号
+ * 一个用户多个类型账号
  */
-class Account(val type: AccountType = AccountType.PRIMARY) {
-    var id: String = null!!
-    var name: String = null!!
+class Account() {
+    //用户编号
+    var userId: Long = null!!
+    //登陆名
+    var loginName: String? = null
+    //凭证或密码
+    var token: String = null!!
+    //账号类型
+    var type: AccountType = AccountType.MAIL
+    //昵称
+    var nickName: String = null!!
 }
 
 /**
@@ -105,6 +118,7 @@ class UserDetail : BaseUser() {
     /**
      * 账号列表
      */
+    var accounts: List<Account> = null!!
 }
 
 /**
@@ -127,46 +141,44 @@ interface IdentityService {
     /**
      * 登陆
      */
-    @ResponseBody
+    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/login")
     fun login(@RequestBody req: LoginReq): String
 
     /**
      * 停用
      */
-    @ResponseStatus(HttpStatus.OK)
-    fun disableUsers(@RequestParam userIds: Set<Long>)
-
-    /**
-     * 启用
-     */
-    @ResponseStatus(HttpStatus.OK)
-    fun enableUsers(@RequestParam userIds: Set<Long>)
+    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/updateUserStatus")
+    fun updateUserStatus(@RequestBody req: ChangeStatusReq)
 
     /**
      * 获取用户详情
      */
-    @ResponseBody
+    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/userDetails")
     fun getUserDetails(@RequestParam userIds: Set<Long>): Map<Long, UserDetail>
 
     /**
      * 获取用户详情
      */
-    @ResponseBody
-    fun getUserDetail(@RequestParam userId: Long)
+    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/userDetail/{userId}")
+    fun getUserDetail(@RequestParam userId: Long): UserDetail
 
     /**
      * 创建用户
      */
-    @ResponseBody
+    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/user")
     fun createUser(@RequestBody user: User): User
 
     /**
      * 修改用户密码
      */
-    fun safeChangePwd(req: SafeChangePwdReq)
+    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/safeChangePwd")
+    fun safeChangePwd(@RequestBody req: SafeChangePwdReq)
 
     /**
      * 直接修改用户密码
      */
-    fun changePwd(req: ChangePwdReq)
+    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/changePwd")
+    fun changePwd(@RequestBody req: ChangePwdReq)
+
+
 }
