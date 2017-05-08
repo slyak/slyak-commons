@@ -179,6 +179,4 @@ interface IdentityService {
      */
     @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/changePwd")
     fun changePwd(@RequestBody req: ChangePwdReq)
-
-
 }

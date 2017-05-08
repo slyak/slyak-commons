@@ -14,23 +14,23 @@
  *  limitations under the License.
  */
 
-package com.slyak.gateway;
+package com.slyak.services.file.event;
 
-import com.slyak.services.CacheService;
-import com.slyak.services.UserInfo;
+import com.slyak.services.file.domain.FileInfo;
+import org.springframework.context.ApplicationEvent;
 
 /**
  * .
  *
- * @author stormning 2017/3/22
- * @since 1.0.0
+ * @author stormning on 2017/1/6.
  */
-public class Application {
-
-	private CacheService cacheService;
-
-
-	private void t(){
-		UserInfo u = cacheService.get("a");
+public class FilePreStoreEvent extends ApplicationEvent {
+	/**
+	 * Create a new ApplicationEvent.
+	 *
+	 * @param source the object on which the event initially occurred (never {@code null})
+	 */
+	public FilePreStoreEvent(FileInfo source) {
+		super(source);
 	}
 }

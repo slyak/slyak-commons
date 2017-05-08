@@ -54,5 +54,6 @@
         <module>slyak-proxy</module>
         <module>slyak-widget</module>
         <module>slyak-workflow</module>
+        <module>slyak-test</module>
     </modules>
 </project>
