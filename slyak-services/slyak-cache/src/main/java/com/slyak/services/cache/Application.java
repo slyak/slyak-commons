@@ -14,17 +14,23 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.services.registry.config;
+package com.slyak.services.cache;
 
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * .
  *
- * @author stormning 2017/3/30
+ * @author stormning 2017/4/7
  * @since 1.3.0
  */
-@EnableEurekaServer
-public class EurekaServerConfig {
+@SpringBootApplication
+@EnableDiscoveryClient
+public class Application {
 
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
 }

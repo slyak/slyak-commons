@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.gateway;
+package com.slyak.services.services.workflow;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

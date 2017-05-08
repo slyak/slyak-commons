@@ -62,6 +62,5 @@
     <modules>
         <module>slyak-sdks</module>
         <module>slyak-services</module>
-        <module>slyak-sdks</module>
     </modules>
 </project>
