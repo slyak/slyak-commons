@@ -1,5 +1,5 @@
 # slyak-commons
-slyak common service based on spring cloud exposed by docker
+slyak common service based on spring cloud exposed by docker using kotlin
 
 ## architecture
 
