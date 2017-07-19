@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.slyak.services
+package com.slyak.services.identity
 
 import org.springframework.cloud.netflix.feign.FeignClient
 import org.springframework.web.bind.annotation.RequestBody
