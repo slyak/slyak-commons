@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.slyak.services.identity
+package com.slyak.service.identity
 
 import org.springframework.cloud.netflix.feign.FeignClient
 import org.springframework.web.bind.annotation.RequestBody
@@ -36,7 +36,6 @@ class LoginReq {
     var loginName: String = null!!
     var password: String = null!!
 }
-
 
 /**
  * 修改密码请求

@@ -18,19 +18,14 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>slyak-sdks</artifactId>
-        <groupId>com.slyak.commons</groupId>
-        <version>1.0.0-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>slyak-apis</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.0.Final</version>
-        </dependency>
-    </dependencies>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.slyak.service</groupId>
+    <artifactId>slyak-serivce</artifactId>
+
+    <modules>
+        <module>slyak-cache</module>
+        <module>slyak-counter</module>
+        <module>slyak-identity</module>
+    </modules>
 </project>
