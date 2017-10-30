@@ -58,9 +58,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <modules>
-        <module>slyak-sdks</module>
-        <module>slyak-services</module>
-    </modules>
 </project>
