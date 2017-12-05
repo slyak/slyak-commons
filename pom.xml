@@ -10,9 +10,9 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.slyak.commons</groupId>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>slyak-commons</artifactId>
+    <groupId>com.slyak.service</groupId>
+    <artifactId>slyak-service-build</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <name>SLYAK Commons</name>
     <description>SLYAK Commons</description>
@@ -58,4 +58,10 @@
             </plugin>
         </plugins>
     </build>
+
+    <modules>
+        <module>slyak-api</module>
+        <module>slyak-impl-parent</module>
+        <module>slyak-service-dependences</module>
+    </modules>
 </project>
