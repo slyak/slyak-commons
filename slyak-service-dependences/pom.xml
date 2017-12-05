@@ -13,6 +13,8 @@
     <artifactId>slyak-service-dependences</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <name>SLYAK Service Dependences</name>
+    <description>SLYAK Service Dependences</description>
 
     <dependencies>
         <dependency>
